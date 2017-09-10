@@ -23,7 +23,7 @@ exports = module.exports = __webpack_require__(33)();
 exports.i(__webpack_require__(163), "");
 
 // module
-exports.push([module.i, "/* You can add global styles to this file, and also import other style files */\nh1,h2,input.mat-input-element:disabled,input.mat-input-element {\n    color: #4cb61b;\n}\n.mat-input-element.time {\n    font-size:200%;\n    text-align: center;\n}\n\n.mat-button-toggle-checked {\n    background-color: #4cb61b;\n    color: white;\n}\nh1,h2 {\n    font-family: Roboto,\"Helvetica Neue\",sans-serif;\n    font-weight: normal;\n}", ""]);
+exports.push([module.i, "/* You can add global styles to this file, and also import other style files */\nh1,h2,input.mat-input-element:disabled,input.mat-input-element {\n    color: #4cb61b;\n}\n.time {\n    font-size:300%;\n    text-align: center;\n}\n\n.mat-button-toggle-checked {\n    background-color: #4cb61b;\n    color: white;\n}\nh1,h2 {\n    font-family: Roboto,\"Helvetica Neue\",sans-serif;\n    font-weight: normal;\n}", ""]);
 
 // exports
 
