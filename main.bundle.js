@@ -20,31 +20,41 @@ var AppComponent = (function () {
     function AppComponent() {
         var _this = this;
         this.title = 'UpSlack';
-        var defaultValues = { 'rawMinutes': 0, 'rate': 57, 'exchangeRate': 57.66, 'fee': 20 };
-        ['rawMinutes', 'rate', 'exchangeRate', 'fee'].map(function (field) {
-            var val;
-            if (val = parseFloat(localStorage.getItem(field))) {
-                _this[field] = val;
-            }
-            else {
-                _this[field] = defaultValues[field];
-            }
+        this.trackers = {
+            'tracker-1': {},
+            'tracker-2': {},
+        };
+        ['tracker-1', 'tracker-2'].map(function (tracker) {
+            ['rawMinutes', 'rate', 'exchangeRate', 'fee'].map(function (field) {
+                var defaultValues = { 'rawMinutes': 0, 'rate': 57, 'exchangeRate': 57.66, 'fee': 20 };
+                var val;
+                if (val = parseFloat(localStorage.getItem(tracker + '-' + field))) {
+                    _this.trackers[tracker][field] = val;
+                }
+                else {
+                    _this.trackers[tracker][field] = defaultValues[field];
+                }
+                console.log(tracker, field);
+            });
         });
-        this.changeTime(0);
+        this.changeTime(1, 0);
+        this.changeTime(2, 0);
     }
-    AppComponent.prototype.changeTime = function (diff) {
-        if (0 > this.rawMinutes + diff) {
+    AppComponent.prototype.changeTime = function (tracker, diff) {
+        if (0 > this.trackers['tracker-' + tracker]['rawMinutes'] + diff) {
             return;
         }
-        this.rawMinutes += diff;
-        this.hours = Math.floor(this.rawMinutes / 60);
-        this.minutes = this.rawMinutes % 60;
+        this.trackers['tracker-' + tracker]['rawMinutes'] += diff;
+        this.trackers['tracker-' + tracker]['hours'] = Math.floor(this.trackers['tracker-' + tracker]['rawMinutes'] / 60);
+        this.trackers['tracker-' + tracker]['minutes'] = this.trackers['tracker-' + tracker]['rawMinutes'] % 60;
         this.updateLS();
     };
     AppComponent.prototype.updateLS = function () {
         var _this = this;
-        ['rawMinutes', 'rate', 'exchangeRate', 'fee'].map(function (field) {
-            localStorage.setItem(field, _this[field]);
+        ['tracker-1', 'tracker-2'].map(function (tracker) {
+            ['rawMinutes', 'rate', 'exchangeRate', 'fee'].map(function (field) {
+                localStorage.setItem(tracker + '-' + field, _this.trackers[tracker][field]);
+            });
         });
     };
     return AppComponent;
@@ -154,7 +164,7 @@ module.exports = module.exports.toString();
 /***/ 166:
 /***/ (function(module, exports) {
 
-module.exports = "<md-grid-list cols=\"4\" rowheight=\"70px\">\n    <md-grid-tile colspan=\"1\">\n        <md-form-field>\n            <input mdInput type=\"number\" placeholder=\"Hourly Rate\" [(ngModel)]=\"rate\">\n        </md-form-field>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"1\">\n        <md-form-field>\n            <input mdInput type=\"number\" placeholder=\"USDRUB\" [(ngModel)]=\"exchangeRate\">\n        </md-form-field>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"2\">\n        <md-button-toggle-group [(ngModel)]=\"fee\">\n            <md-button-toggle value=\"20\">\n                20\n            </md-button-toggle>\n            <md-button-toggle value=\"10\">\n                10\n            </md-button-toggle>\n            <md-button-toggle value=\"5\">\n                5\n            </md-button-toggle>\n        </md-button-toggle-group>\n    </md-grid-tile>\n    <md-grid-tile>\n        <button md-button (click)=\"changeTime(-10)\">–</button>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"2\">\n        <h1 class=\"time\">\n            {{ hours | number:'2.0-0' }} : {{ minutes | number:'2.0-0' }}\n        </h1>\n    </md-grid-tile>\n    <md-grid-tile>\n        <button md-button (click)=\"changeTime(10)\">+</button>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"2\">\n        <h1>${{ rate * rawMinutes * (1 - fee / 100) / 60 | number:'.2-2' }}</h1>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"2\">\n        <h2>{{ exchangeRate * rate * rawMinutes * (1 - fee / 100) / 60 | number:'.2-2' }}₽</h2>\n    </md-grid-tile>\n</md-grid-list>\n"
+module.exports = "<md-grid-list cols=\"4\" rowheight=\"70px\">\n    <md-grid-tile colspan=\"1\">\n        <md-form-field>\n            <input mdInput type=\"number\" placeholder=\"Hourly Rate\" [(ngModel)]=\"trackers['tracker-1']['rate']\">\n        </md-form-field>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"1\">\n        <md-form-field>\n            <input mdInput type=\"number\" placeholder=\"USDRUB\" [(ngModel)]=\"trackers['tracker-1']['exchangeRate']\">\n        </md-form-field>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"2\">\n        <md-button-toggle-group [(ngModel)]=\"trackers['tracker-1']['fee']\">\n            <md-button-toggle value=\"20\">\n                20\n            </md-button-toggle>\n            <md-button-toggle value=\"10\">\n                10\n            </md-button-toggle>\n            <md-button-toggle value=\"5\">\n                5\n            </md-button-toggle>\n        </md-button-toggle-group>\n    </md-grid-tile>\n    <md-grid-tile>\n        <button md-button (click)=\"changeTime(1, -10)\">–</button>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"2\">\n        <h1 class=\"time\">\n            {{ trackers['tracker-1']['hours'] | number:'2.0-0' }} : {{ trackers['tracker-1']['minutes'] | number:'2.0-0' }}\n        </h1>\n    </md-grid-tile>\n    <md-grid-tile>\n        <button md-button (click)=\"changeTime(1, 10)\">+</button>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"2\">\n        <h1>${{ trackers['tracker-1']['rate'] * trackers['tracker-1']['rawMinutes'] * (1 - trackers['tracker-1']['fee'] / 100) / 60 | number:'.2-2' }}</h1>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"2\">\n        <h2>{{ trackers['tracker-1']['exchangeRate'] * trackers['tracker-1']['rate'] * trackers['tracker-1']['rawMinutes'] * (1 - trackers['tracker-1']['fee'] / 100) / 60 | number:'.2-2' }}₽</h2>\n    </md-grid-tile>\n</md-grid-list>\n<md-grid-list cols=\"4\" rowheight=\"70px\">\n    <md-grid-tile colspan=\"1\">\n        <md-form-field>\n            <input mdInput type=\"number\" placeholder=\"Hourly Rate\" [(ngModel)]=\"trackers['tracker-2']['rate']\">\n        </md-form-field>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"1\">\n        <md-form-field>\n            <input mdInput type=\"number\" placeholder=\"USDRUB\" [(ngModel)]=\"trackers['tracker-2']['exchangeRate']\">\n        </md-form-field>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"2\">\n        <md-button-toggle-group [(ngModel)]=\"trackers['tracker-2']['fee']\">\n            <md-button-toggle value=\"20\">\n                20\n            </md-button-toggle>\n            <md-button-toggle value=\"10\">\n                10\n            </md-button-toggle>\n            <md-button-toggle value=\"5\">\n                5\n            </md-button-toggle>\n        </md-button-toggle-group>\n    </md-grid-tile>\n    <md-grid-tile>\n        <button md-button (click)=\"changeTime(2, -10)\">–</button>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"2\">\n        <h1 class=\"time\">\n            {{ trackers['tracker-2']['hours'] | number:'2.0-0' }} : {{ trackers['tracker-2']['minutes'] | number:'2.0-0' }}\n        </h1>\n    </md-grid-tile>\n    <md-grid-tile>\n        <button md-button (click)=\"changeTime(2, 10)\">+</button>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"2\">\n        <h1>${{ trackers['tracker-2']['rate'] * trackers['tracker-2']['rawMinutes'] * (1 - trackers['tracker-2']['fee'] / 100) / 60 | number:'.2-2' }}</h1>\n    </md-grid-tile>\n    <md-grid-tile colspan=\"2\">\n        <h2>{{ trackers['tracker-2']['exchangeRate'] * trackers['tracker-2']['rate'] * trackers['tracker-2']['rawMinutes'] * (1 - trackers['tracker-2']['fee'] / 100) / 60 | number:'.2-2' }}₽</h2>\n    </md-grid-tile>\n</md-grid-list>\n"
 
 /***/ }),
 
